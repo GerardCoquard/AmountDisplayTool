@@ -550,10 +550,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf033d73914f49d4f9f876fb5ed4b103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
+  maxHealth: 5
   currentHealth: 0
-  damageAmount: 1
-  healAmount: 1
+  damageAmount: 3
+  healAmount: 3
   maxHealthAmount: 1
 --- !u!4 &948263430
 Transform:
@@ -647,8 +647,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2114858328}
-  - component: {fileID: 2114858330}
   - component: {fileID: 2114858331}
+  - component: {fileID: 2114858330}
   m_Layer: 5
   m_Name: HealthDisplay
   m_TagString: Untagged
@@ -714,14 +714,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29dac41ada95fdd4eb8f6d303371eb85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spacing: 4
+  _spacing: -12
   segmentValue: 1
+  fillColor: {r: 0, g: 0.4755411, b: 1, a: 1}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
   singlePrefab: 0
-  segmentPrefab: {fileID: 1887917055295210220, guid: d06a445e4f11f9c4f91e23df5acc8d60,
+  segmentPrefab: {fileID: 8179302343870085684, guid: 0d19de09472beb349a046dcbd62c6f5e,
     type: 3}
-  firstSegmentPrefab: {fileID: 1818446997292568277, guid: 603367a808c87194388f8247fa2250ae,
+  firstSegmentPrefab: {fileID: 461224605866867311, guid: d2cd5c39886b7364b83cfeb7342d3cdb,
     type: 3}
-  middleSegmentPrefab: {fileID: 4906339833746998036, guid: f12392c5e8bc01443bb8a4998b00dc58,
+  middleSegmentPrefab: {fileID: 2542566995616015861, guid: 49f6d3df24134cb4ba17693c38ad8a40,
     type: 3}
-  lastSegmentPrefab: {fileID: 9121912733923742592, guid: 0cb37a107bdf5c94b972a40b3064e1f0,
+  lastSegmentPrefab: {fileID: 1986691458190694682, guid: 84b3690475015b34585a78d597e674c7,
     type: 3}
+  follow: 1
+  followTime: 0.5
+  followGainColor: {r: 1, g: 1, b: 1, a: 1}
+  followLoseColor: {r: 0, g: 0.6226415, b: 0.035745107, a: 1}
+  unscaledTime: 1

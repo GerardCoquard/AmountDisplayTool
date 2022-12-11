@@ -12,36 +12,46 @@ public class HealthDisplay : MonoBehaviour
 {
     [SerializeField] float _spacing;
     [SerializeField] float segmentValue;
+    [SerializeField] Color fillColor;
+    [SerializeField] Color backgroundColor;
     [SerializeField] bool singlePrefab;
     [SerializeField] GameObject segmentPrefab;
     [SerializeField] GameObject firstSegmentPrefab;
     [SerializeField] GameObject middleSegmentPrefab;
     [SerializeField] GameObject lastSegmentPrefab;
+    [SerializeField] bool follow;
+    [SerializeField] float followTime;
+    [SerializeField] Color followGainColor;
+    [SerializeField] Color followLoseColor;
+    [SerializeField] bool unscaledTime;
     HorizontalLayoutGroup layoutGroup;
     List<Image> fills;
+    List<Image> fillsFollow;
+    List<Image> background;
     private void OnEnable() {
         HealthSystem.OnSetHealth += InitializeAll;
-        HealthSystem.OnHealthChanged += SetFills;
+        HealthSystem.OnHealthChanged += SetFillsFollow;
     }
     private void OnDisable() {
         HealthSystem.OnSetHealth -= InitializeAll;
-        HealthSystem.OnHealthChanged -= SetFills;
+        HealthSystem.OnHealthChanged -= SetFillsFollow;
     }
     private void Awake() {
         layoutGroup = GetComponent<HorizontalLayoutGroup>();
         layoutGroup.spacing = _spacing;
         fills = new List<Image>();
+        fillsFollow = new List<Image>();
+        background = new List<Image>();
     }
     void InitializeAll(float health,float maxHP)
     {
         StopAllCoroutines();
         SetSegments(maxHP);
-        SetFills(health,maxHP,true);
+        SetFills(fills,health);
+        SetFills(fillsFollow,0);
     }
-    void UpdateHealthBar(float actualHealth,float previousHealth,bool damage)
-    {
-        
-    }
+
+    ///////////////////////SEGMENTS///////////////////////
     void SetSegments(float maxHealth)
     {
         int newSegments = Mathf.CeilToInt(maxHealth/segmentValue);
@@ -61,7 +71,8 @@ public class HealthDisplay : MonoBehaviour
         if(transform.childCount != 0)
         {
             DeleteSegment();
-            CreateSegment(singlePrefab ? segmentPrefab : middleSegmentPrefab);
+            if(transform.childCount == 0) CreateSegment(singlePrefab ? segmentPrefab : firstSegmentPrefab);
+            else CreateSegment(singlePrefab ? segmentPrefab : middleSegmentPrefab);
         }
         for (int i = 0; i < amount; i++)
         {
@@ -79,26 +90,81 @@ public class HealthDisplay : MonoBehaviour
         {
             DeleteSegment();
         }
-        CreateSegment(singlePrefab ? segmentPrefab : lastSegmentPrefab);
+        if(transform.childCount != 0) CreateSegment(singlePrefab ? segmentPrefab : lastSegmentPrefab);
+        else CreateSegment(singlePrefab ? segmentPrefab : firstSegmentPrefab); //or add a extra segment prefab for this case
+        
     }
     void CreateSegment(GameObject prefab)
     {
         GameObject segment = Instantiate(prefab,transform.position,Quaternion.identity,transform);
-        fills.Add(segment.GetComponent<HealthFill>().GetFill());
+        HealthFill healthFill = segment.GetComponent<HealthFill>();
+        fills.Add(healthFill.GetFill());
+        fillsFollow.Add(healthFill.GetFillFollow());
+        background.Add(healthFill.GetBackground());
+        healthFill.GetFill().color = fillColor;
+        healthFill.GetBackground().color = backgroundColor;
     }
     void DeleteSegment()
     {
         GameObject segment = transform.GetChild(transform.childCount-1).gameObject;
-        fills.Remove(segment.GetComponent<HealthFill>().GetFill());
+        HealthFill healthFill = segment.GetComponent<HealthFill>();
+        fills.Remove(healthFill.GetFill());
+        fillsFollow.Remove(healthFill.GetFillFollow());
+        background.Remove(healthFill.GetBackground());
         DestroyImmediate(segment);
     }
-    void SetFills(float currentHealth, float maxHealth,bool damage)
+
+    ///////////////////////FILLS///////////////////////
+    void SetFills(List<Image> fillList, float currentHealth)
     {
         for (int i = 0; i < transform.childCount; i++)
         {
-            fills[i].fillAmount = Mathf.Clamp(((currentHealth - i * segmentValue)/segmentValue),0,1);
+            fillList[i].fillAmount = Mathf.Clamp(((currentHealth - i * segmentValue)/segmentValue),0,1);
         }
     }
+    void SetFillsFollow(float actualHealth, float previousHealth, bool heal)
+    {
+        if(!follow)
+        {
+            SetFills(fills,actualHealth);
+            return;
+        }
+
+        StopAllCoroutines();
+        if(heal)
+        {
+            SetFillColor(fillsFollow,followGainColor);
+            SetFills(fillsFollow,actualHealth);
+            StartCoroutine(GoFromTo(fills,previousHealth,actualHealth));
+        }
+        else
+        {
+            SetFillColor(fillsFollow,followLoseColor);
+            SetFills(fills,actualHealth);
+            StartCoroutine(GoFromTo(fillsFollow,previousHealth,actualHealth));
+        }
+    }
+    IEnumerator GoFromTo(List<Image> fillList, float from, float to)
+    {
+        SetFills(fillList,from);
+        float timer = 0;
+        while (timer < followTime)
+        {
+            SetFills(fillList, Mathf.Lerp(from,to,timer/followTime));
+            timer += unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            yield return null;
+        }
+        SetFills(fillList, to);
+    }
+    void SetFillColor(List<Image> fillList,Color color)
+    {
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            fillList[i].color = color;
+        }
+    }
+
+    ///////////////////////EDITOR///////////////////////
 
     #region Editor
 #if UNITY_EDITOR
@@ -115,6 +181,14 @@ public class HealthDisplay : MonoBehaviour
 
             EditorGUILayout.BeginHorizontal();
             healthDisplay._spacing = (float)EditorGUILayout.FloatField("Segment Spacing",healthDisplay._spacing);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            healthDisplay.fillColor = (Color)EditorGUILayout.ColorField("Fill Color",healthDisplay.fillColor);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            healthDisplay.backgroundColor = (Color)EditorGUILayout.ColorField("Background Color",healthDisplay.backgroundColor);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -142,18 +216,41 @@ public class HealthDisplay : MonoBehaviour
                 EditorGUILayout.EndHorizontal();
             }
 
+            EditorGUILayout.BeginHorizontal();
+            healthDisplay.follow = (bool)EditorGUILayout.Toggle("Follow",healthDisplay.follow);
+            EditorGUILayout.EndHorizontal();
+
+            if(healthDisplay.follow)
+            {
+                EditorGUILayout.BeginHorizontal();
+                healthDisplay.followTime = (float)EditorGUILayout.FloatField("Follow Time",healthDisplay.followTime);
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                healthDisplay.followGainColor = (Color)EditorGUILayout.ColorField("Follow Gain Color",healthDisplay.followGainColor);
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                healthDisplay.followLoseColor = (Color)EditorGUILayout.ColorField("Follow Lose Color",healthDisplay.followLoseColor);
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUILayout.BeginHorizontal();
+                healthDisplay.unscaledTime = (bool)EditorGUILayout.Toggle("Unscaled Time",healthDisplay.unscaledTime);
+                EditorGUILayout.EndHorizontal();
+            }
+
             if(GUI.changed)
             {
                 //it all works withouth this, but prefer to keep it just in case
 
-                Undo.RecordObject(this,"q");
-                Undo.RecordObject(target,"b");
-                Undo.RecordObject(healthDisplay,"a");
+                Undo.RecordObject(this,"");
+                Undo.RecordObject(target,"");
+                Undo.RecordObject(healthDisplay,"");
 
                 SaveChanges();
                 
                 EditorUtility.SetDirty(this);
-                EditorUtility.SetDirty(target);
+                //EditorUtility.SetDirty(target);
                 EditorUtility.SetDirty(healthDisplay);
                 EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             }

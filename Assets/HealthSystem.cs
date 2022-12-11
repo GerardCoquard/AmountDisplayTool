@@ -12,7 +12,7 @@ public class HealthSystem : MonoBehaviour, ITakeDamage
     [SerializeField] float maxHealthAmount;
     bool isAlive;
     public delegate void SetHealth(float health,float maxHealth);
-    public delegate void HealthChanged(float actualHealth,float previousHealth,bool damage);
+    public delegate void HealthChanged(float actualHealth,float previousHealth,bool heal);
     public static event SetHealth OnSetHealth;
     public static event HealthChanged OnHealthChanged;
     void Start()
@@ -52,7 +52,7 @@ public class HealthSystem : MonoBehaviour, ITakeDamage
         float previousHealth = currentHealth;
         currentHealth = Mathf.Clamp(currentHealth-damage,0,maxHealth);
         //Update UI
-        OnHealthChanged?.Invoke(currentHealth,previousHealth,true);
+        OnHealthChanged?.Invoke(currentHealth,previousHealth,false);
         //Comprobación de posible final de partida
         isAlive = currentHealth > 0;
         if(!isAlive)
@@ -64,7 +64,7 @@ public class HealthSystem : MonoBehaviour, ITakeDamage
     {
         if(!isAlive) return;
         //Update UI
-        OnHealthChanged?.Invoke(Mathf.Clamp(currentHealth + amount,0,maxHealth),currentHealth,false);
+        OnHealthChanged?.Invoke(Mathf.Clamp(currentHealth + amount,0,maxHealth),currentHealth,true);
         //Logic
         currentHealth = Mathf.Clamp(currentHealth + amount,0,maxHealth);
     }
