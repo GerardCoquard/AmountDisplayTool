@@ -11,7 +11,6 @@ using UnityEngine.UI;
 public class HealthDisplay : MonoBehaviour
 {
     [SerializeField] float _spacing;
-    [SerializeField] float segmentValue;
     [SerializeField] Color fillColor;
     [SerializeField] Color backgroundColor;
     [SerializeField] bool singlePrefab;
@@ -24,6 +23,7 @@ public class HealthDisplay : MonoBehaviour
     [SerializeField] Color followGainColor;
     [SerializeField] Color followLoseColor;
     [SerializeField] bool unscaledTime;
+    /*[SerializeField]*/ float segmentValue; //change if want segment value to be on display instead of the manager
     HorizontalLayoutGroup layoutGroup;
     List<Image> fills;
     List<Image> fillsFollow;
@@ -43,9 +43,10 @@ public class HealthDisplay : MonoBehaviour
         fillsFollow = new List<Image>();
         background = new List<Image>();
     }
-    void InitializeAll(float health,float maxHP)
+    void InitializeAll(float health,float maxHP, float _segmentValue)
     {
         StopAllCoroutines();
+        segmentValue = _segmentValue;
         SetSegments(maxHP);
         SetFills(fills,health);
         SetFills(fillsFollow,0);
@@ -174,10 +175,12 @@ public class HealthDisplay : MonoBehaviour
         public override void OnInspectorGUI()
         {
             HealthDisplay healthDisplay = (HealthDisplay)target;
-
-            EditorGUILayout.BeginHorizontal();
-            healthDisplay.segmentValue = (float)EditorGUILayout.FloatField("Segment Value",healthDisplay.segmentValue);
-            EditorGUILayout.EndHorizontal();
+            
+            //change if want segment value to be on display instead of the manager
+            
+            //EditorGUILayout.BeginHorizontal();
+            //healthDisplay.segmentValue = (float)EditorGUILayout.FloatField("Segment Value",healthDisplay.segmentValue);
+            //EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             healthDisplay._spacing = (float)EditorGUILayout.FloatField("Segment Spacing",healthDisplay._spacing);

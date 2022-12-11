@@ -5,13 +5,14 @@ using UnityEngine;
 public class HealthSystem : MonoBehaviour, ITakeDamage
 {
     [SerializeField] float maxHealth;
+    [SerializeField] float segmentValue;
     float currentHealth;
     [Header("HACKS")]
     [SerializeField] float damageAmount;
     [SerializeField] float healAmount;
     [SerializeField] float maxHealthAmount;
     bool isAlive;
-    public delegate void SetHealth(float health,float maxHealth);
+    public delegate void SetHealth(float health,float maxHealth,float _segmentValue);
     public delegate void HealthChanged(float actualHealth,float previousHealth,bool heal);
     public static event SetHealth OnSetHealth;
     public static event HealthChanged OnHealthChanged;
@@ -19,7 +20,7 @@ public class HealthSystem : MonoBehaviour, ITakeDamage
     {
         isAlive = true;
         currentHealth = maxHealth;
-        OnSetHealth?.Invoke(currentHealth,maxHealth);
+        OnSetHealth?.Invoke(currentHealth,maxHealth,segmentValue);
     }
     /////////////////////////////
     private void Update() {
@@ -75,7 +76,7 @@ public class HealthSystem : MonoBehaviour, ITakeDamage
         maxHealth += amount;
         currentHealth += amount;
         //Update UI
-        OnSetHealth?.Invoke(currentHealth,maxHealth);
+        OnSetHealth?.Invoke(currentHealth,maxHealth,segmentValue);
     }
     public void RemoveMaxHealth(float amount)
     {
@@ -84,7 +85,7 @@ public class HealthSystem : MonoBehaviour, ITakeDamage
         maxHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth,0,maxHealth);
         //Update UI
-        OnSetHealth?.Invoke(currentHealth,maxHealth);
+        OnSetHealth?.Invoke(currentHealth,maxHealth,segmentValue);
     }
     public bool CanHeal()
     {

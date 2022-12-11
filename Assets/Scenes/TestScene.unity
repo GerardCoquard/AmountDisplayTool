@@ -551,8 +551,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  damageAmount: 12
-  healAmount: 60
+  segmentValue: 20
+  damageAmount: 22
+  healAmount: 30
   maxHealthAmount: 20
 --- !u!4 &948263430
 Transform:
@@ -714,7 +715,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spacing: 5
-  segmentValue: 20
   fillColor: {r: 0.6226415, g: 0.04150943, b: 0, a: 1}
   backgroundColor: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 0.7607843}
   singlePrefab: 1
