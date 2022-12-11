@@ -13,10 +13,10 @@ public class HealthDisplay : MonoBehaviour
     [SerializeField] float _spacing;
     [SerializeField] float segmentValue;
     [SerializeField] bool singlePrefab;
-    GameObject segmentPrefab;
-    GameObject firstSegmentPrefab;
-    GameObject middleSegmentPrefab;
-    GameObject lastSegmentPrefab;
+    [SerializeField] GameObject segmentPrefab;
+    [SerializeField] GameObject firstSegmentPrefab;
+    [SerializeField] GameObject middleSegmentPrefab;
+    [SerializeField] GameObject lastSegmentPrefab;
     HorizontalLayoutGroup layoutGroup;
     List<Image> fills;
     private void OnEnable() {
@@ -104,10 +104,20 @@ public class HealthDisplay : MonoBehaviour
     {
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
             HealthDisplay healthDisplay = (HealthDisplay)target;
-            EditorGUILayout.Space();
-            
+
+            EditorGUILayout.BeginHorizontal();
+            healthDisplay.segmentValue = (float)EditorGUILayout.FloatField("Segment Value",healthDisplay.segmentValue);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            healthDisplay._spacing = (float)EditorGUILayout.FloatField("Segment Spacing",healthDisplay._spacing);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            healthDisplay.singlePrefab = (bool)EditorGUILayout.Toggle("Single Prefab",healthDisplay.singlePrefab);
+            EditorGUILayout.EndHorizontal();
+
             if(healthDisplay.singlePrefab)
             {
                 EditorGUILayout.BeginHorizontal();
