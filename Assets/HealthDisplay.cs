@@ -115,7 +115,7 @@ public class HealthDisplay : MonoBehaviour
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            healthDisplay.singlePrefab = (bool)EditorGUILayout.Toggle("Single Prefab",healthDisplay.singlePrefab);
+            healthDisplay.singlePrefab = (bool)EditorGUILayout.Toggle("Single Segment",healthDisplay.singlePrefab);
             EditorGUILayout.EndHorizontal();
 
             if(healthDisplay.singlePrefab)
@@ -141,6 +141,8 @@ public class HealthDisplay : MonoBehaviour
 
             if(GUI.changed)
             {
+                //it all works withouth this, but prefer to keep it just in case
+                
                 Undo.RecordObject(this,"q");
                 Undo.RecordObject(target,"b");
                 Undo.RecordObject(healthDisplay,"a");
