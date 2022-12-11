@@ -21,11 +21,11 @@ public class HealthDisplay : MonoBehaviour
     List<Image> fills;
     private void OnEnable() {
         HealthSystem.OnSetHealth += InitializeAll;
-        HealthSystem.OnHealthChanged += UpdateHealthBar;
+        HealthSystem.OnHealthChanged += SetFills;
     }
     private void OnDisable() {
         HealthSystem.OnSetHealth -= InitializeAll;
-        HealthSystem.OnHealthChanged -= UpdateHealthBar;
+        HealthSystem.OnHealthChanged -= SetFills;
     }
     private void Awake() {
         layoutGroup = GetComponent<HorizontalLayoutGroup>();
@@ -36,6 +36,7 @@ public class HealthDisplay : MonoBehaviour
     {
         StopAllCoroutines();
         SetSegments(maxHP);
+        SetFills(health,maxHP,true);
     }
     void UpdateHealthBar(float actualHealth,float previousHealth,bool damage)
     {
@@ -54,7 +55,6 @@ public class HealthDisplay : MonoBehaviour
         {
             RemoveSegments(Mathf.Abs(neededSegments));
         }
-        SetFills();
     }
     void AddSegments(int amount)
     {
@@ -92,9 +92,12 @@ public class HealthDisplay : MonoBehaviour
         fills.Remove(segment.GetComponent<HealthFill>().GetFill());
         DestroyImmediate(segment);
     }
-    void SetFills()
+    void SetFills(float currentHealth, float maxHealth,bool damage)
     {
-
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            fills[i].fillAmount = Mathf.Clamp(((currentHealth - i * segmentValue)/segmentValue),0,1);
+        }
     }
 
     #region Editor
@@ -142,7 +145,7 @@ public class HealthDisplay : MonoBehaviour
             if(GUI.changed)
             {
                 //it all works withouth this, but prefer to keep it just in case
-                
+
                 Undo.RecordObject(this,"q");
                 Undo.RecordObject(target,"b");
                 Undo.RecordObject(healthDisplay,"a");
