@@ -550,11 +550,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf033d73914f49d4f9f876fb5ed4b103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 5
-  currentHealth: 0
-  damageAmount: 3
-  healAmount: 3
-  maxHealthAmount: 1
+  maxHealth: 100
+  damageAmount: 12
+  healAmount: 60
+  maxHealthAmount: 20
 --- !u!4 &948263430
 Transform:
   m_ObjectHideFlags: 0
@@ -714,11 +713,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29dac41ada95fdd4eb8f6d303371eb85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spacing: -12
-  segmentValue: 1
+  _spacing: 5
+  segmentValue: 20
   fillColor: {r: 0.6226415, g: 0.04150943, b: 0, a: 1}
   backgroundColor: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 0.7607843}
-  singlePrefab: 0
+  singlePrefab: 1
   segmentPrefab: {fileID: 8179302343870085684, guid: 0d19de09472beb349a046dcbd62c6f5e,
     type: 3}
   firstSegmentPrefab: {fileID: 461224605866867311, guid: d2cd5c39886b7364b83cfeb7342d3cdb,
