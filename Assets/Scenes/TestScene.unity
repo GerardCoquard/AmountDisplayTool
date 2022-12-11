@@ -717,7 +717,7 @@ MonoBehaviour:
   _spacing: 5
   fillColor: {r: 0.6226415, g: 0.04150943, b: 0, a: 1}
   backgroundColor: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 0.7607843}
-  singlePrefab: 1
+  singlePrefab: 0
   segmentPrefab: {fileID: 8179302343870085684, guid: 0d19de09472beb349a046dcbd62c6f5e,
     type: 3}
   firstSegmentPrefab: {fileID: 461224605866867311, guid: d2cd5c39886b7364b83cfeb7342d3cdb,
