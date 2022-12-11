@@ -5,7 +5,7 @@ using UnityEngine;
 public class HealthSystem : MonoBehaviour, ITakeDamage
 {
     [SerializeField] float maxHealth;
-    [SerializeField]float currentHealth;
+    float currentHealth;
     [Header("HACKS")]
     [SerializeField] float damageAmount;
     [SerializeField] float healAmount;

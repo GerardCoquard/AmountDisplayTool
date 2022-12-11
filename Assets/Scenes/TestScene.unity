@@ -716,8 +716,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _spacing: -12
   segmentValue: 1
-  fillColor: {r: 0, g: 0.4755411, b: 1, a: 1}
-  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  fillColor: {r: 0.6226415, g: 0.04150943, b: 0, a: 1}
+  backgroundColor: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 0.7607843}
   singlePrefab: 0
   segmentPrefab: {fileID: 8179302343870085684, guid: 0d19de09472beb349a046dcbd62c6f5e,
     type: 3}
@@ -729,6 +729,6 @@ MonoBehaviour:
     type: 3}
   follow: 1
   followTime: 0.5
-  followGainColor: {r: 1, g: 1, b: 1, a: 1}
-  followLoseColor: {r: 0, g: 0.6226415, b: 0.035745107, a: 1}
+  followGainColor: {r: 0, g: 0.62352943, b: 0.03529412, a: 1}
+  followLoseColor: {r: 1, g: 1, b: 1, a: 1}
   unscaledTime: 1
