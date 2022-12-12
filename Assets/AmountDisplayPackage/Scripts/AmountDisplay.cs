@@ -23,8 +23,9 @@ public class AmountDisplay : MonoBehaviour
     [SerializeField] Color followGainColor;
     [SerializeField] Color followLoseColor;
     [SerializeField] bool unscaledTime;
-    /*[SerializeField]*/ float segmentValue; //change if want segment value to be on display instead of the manager
+    float segmentValue;
     HorizontalLayoutGroup layoutGroup;
+    Image emptyImage;
     List<Image> fills;
     List<Image> fillsFollow;
     List<Image> background;
@@ -37,16 +38,20 @@ public class AmountDisplay : MonoBehaviour
     //Segments(the visual part that represents the quantity of segmentValue of the Amount)
     
     private void OnEnable() {
-        HealthSystemTest.OnSetHealth += InitializeAll;
-        HealthSystemTest.OnHealthChanged += SetFillsFollow;
+        //CHANGE THE EVENTS TO THE MANAGER SYSTEM THAT YOU WANT!
+        HealthSystemExample.OnSetHealth += InitializeAll;
+        HealthSystemExample.OnHealthChanged += SetFillsFollow;
     }
     private void OnDisable() {
-        HealthSystemTest.OnSetHealth -= InitializeAll;
-        HealthSystemTest.OnHealthChanged -= SetFillsFollow;
+        //CHANGE THE EVENTS TO THE MANAGER SYSTEM THAT YOU WANT!
+        HealthSystemExample.OnSetHealth -= InitializeAll;
+        HealthSystemExample.OnHealthChanged -= SetFillsFollow;
     }
     private void Awake() {
         layoutGroup = GetComponent<HorizontalLayoutGroup>();
         layoutGroup.spacing = _spacing;
+        emptyImage = GetComponent<Image>();
+        emptyImage.enabled = false;
         fills = new List<Image>();
         fillsFollow = new List<Image>();
         background = new List<Image>();
@@ -112,20 +117,15 @@ public class AmountDisplay : MonoBehaviour
         //Instantiate the given segment prefab at the last position, Adds the Images of it to the Lists, and change the Color
         GameObject segment = Instantiate(prefab,transform.position,Quaternion.identity,transform);
         AmountPrefab amountPrefab = segment.GetComponent<AmountPrefab>();
-        fills.Add(amountPrefab.GetFill());
-        fillsFollow.Add(amountPrefab.GetFillFollow());
-        background.Add(amountPrefab.GetBackground());
-        amountPrefab.GetFill().color = fillColor;
-        amountPrefab.GetBackground().color = backgroundColor;
+        AddFills(amountPrefab);
+        SetFillColor(amountPrefab.GetFill(),fillColor);
+        SetFillColor(amountPrefab.GetBackground(),backgroundColor);
     }
     void DeleteSegment()
     {
         //Deletes the last segment, and Removes the Images of the Lists.
         GameObject segment = transform.GetChild(transform.childCount-1).gameObject;
-        AmountPrefab amountPrefab = segment.GetComponent<AmountPrefab>();
-        fills.Remove(amountPrefab.GetFill());
-        fillsFollow.Remove(amountPrefab.GetFillFollow());
-        background.Remove(amountPrefab.GetBackground());
+        RemoveFills(segment.GetComponent<AmountPrefab>());
         DestroyImmediate(segment);
     }
 
@@ -134,41 +134,35 @@ public class AmountDisplay : MonoBehaviour
     {
         //Sets each fillamount of the given List of Images to what it should be based on the current Amount 
         //and the Max Amount(max amount is the same as segmentAmount * segmentValue)
+
         for (int i = 0; i < transform.childCount; i++)
         {
             fillList[i].fillAmount = Mathf.Clamp(((_amount - i * segmentValue)/segmentValue),0,1);
         }
     }
-    void SetFillsFollow(float actualAmount, float previousAmount, bool amountGained)
+    void SetFillsFollow(float actualAmount, float previousAmount)
     {
         //If bool follow is false, then just sets the fill to its value.
-        //If not, in case of gaining Amount it sets the current fill to the previous Amount, and make it follow the follow fill,
-        //which is set at the actual Amount.
+        //If not, sets the follow colors, and in case of gaining Amount it sets the current fill to the previous Amount,
+        //and make it follow the follow fill, which is set at the actual Amount.
         //If losing Amount, the fills switch sides.
-        //It sets the follow colors too.
         if(!follow)
         {
             SetFills(fills,actualAmount);
             return;
         }
 
+        bool amountGained = previousAmount < actualAmount;
         StopAllCoroutines();
-        if(amountGained)
-        {
-            SetFillColor(fillsFollow,followGainColor);
-            SetFills(fillsFollow,actualAmount);
-            StartCoroutine(GoFromTo(fills,previousAmount,actualAmount));
-        }
-        else
-        {
-            SetFillColor(fillsFollow,followLoseColor);
-            SetFills(fills,actualAmount);
-            StartCoroutine(GoFromTo(fillsFollow,previousAmount,actualAmount));
-        }
+
+        SetFillsColor(fillsFollow,amountGained ? followGainColor : followLoseColor);
+        SetFills(amountGained ? fillsFollow : fills,actualAmount);
+        StartCoroutine(GoFromTo(amountGained ? fills : fillsFollow,previousAmount,actualAmount));
     }
     IEnumerator GoFromTo(List<Image> fillList, float from, float to)
     {
         //Make a value go From to To in a perdiod of time, and setts each frame the fill of the given Images List at the value
+
         SetFills(fillList,from);
         float timer = 0;
         while (timer < followTime)
@@ -179,13 +173,40 @@ public class AmountDisplay : MonoBehaviour
         }
         SetFills(fillList, to);
     }
-    void SetFillColor(List<Image> fillList,Color color)
+    void SetFillsColor(List<Image> fillList,Color color)
     {
         //Changes the Color of all the Images of the given List to the given Color
+
         for (int i = 0; i < transform.childCount; i++)
         {
             fillList[i].color = color;
         }
+    }
+    void SetFillColor(Image _image,Color _color)
+    {
+        //Changes the Color of the Image to the given Color
+
+        if(_image != null) _image.color = _color;
+    }
+    void AddFills(AmountPrefab amountPrefab)
+    {
+        AddToList(fills,amountPrefab.GetFill());
+        AddToList(fillsFollow,amountPrefab.GetFillFollow());
+        AddToList(background,amountPrefab.GetBackground());
+    }
+    void RemoveFills(AmountPrefab amountPrefab)
+    {
+        RemoveFromList(fills,amountPrefab.GetFill());
+        RemoveFromList(fillsFollow,amountPrefab.GetFillFollow());
+        RemoveFromList(background,amountPrefab.GetBackground());
+    }
+    void AddToList(List<Image> _list, Image _image)
+    {
+        _list.Add(_image != null? _image : emptyImage);
+    }
+    void RemoveFromList(List<Image> _list, Image _image)
+    {
+        _list.Remove(_image != null? _image : emptyImage);
     }
 
     ///////////////////////EDITOR///////////////////////
@@ -198,12 +219,6 @@ public class AmountDisplay : MonoBehaviour
         public override void OnInspectorGUI()
         {
             AmountDisplay amountDisplay = (AmountDisplay)target;
-            
-            //change if want segment value to be on display instead of the manager
-            
-            //EditorGUILayout.BeginHorizontal();
-            //healthDisplay.segmentValue = (float)EditorGUILayout.FloatField("Segment Value",healthDisplay.segmentValue);
-            //EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
             amountDisplay._spacing = (float)EditorGUILayout.FloatField("Segment Spacing",amountDisplay._spacing);

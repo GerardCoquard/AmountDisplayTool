@@ -2,25 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HealthSystemTest : MonoBehaviour
+public class HealthSystemExample : MonoBehaviour
 {
     [SerializeField] float maxHealth;
     [SerializeField] float segmentValue;
+    bool isAlive;
     float currentHealth;
+    float currentSegmentValue;
+
     [Header("HACKS")]
     [SerializeField] float damageAmount;
     [SerializeField] float healAmount;
     [SerializeField] float maxHealthAmount;
-    bool isAlive;
+    [SerializeField] float segmentValueExtra;
+
+    //Events
     public delegate void SetHealth(float health,float maxHealth,float _segmentValue);
-    public delegate void HealthChanged(float actualHealth,float previousHealth,bool heal);
+    public delegate void HealthChanged(float actualHealth,float previousHealth);
     public static event SetHealth OnSetHealth;
     public static event HealthChanged OnHealthChanged;
     void Start()
     {
         isAlive = true;
         currentHealth = maxHealth;
-        OnSetHealth?.Invoke(currentHealth,maxHealth,segmentValue);
+        currentSegmentValue = segmentValue;
+        OnSetHealth?.Invoke(currentHealth,maxHealth,currentSegmentValue);
     }
     /////////////////////////////
     private void Update() {
@@ -40,6 +46,10 @@ public class HealthSystemTest : MonoBehaviour
         {
             RemoveMaxHealth(maxHealthAmount);
         }
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            ChangeSegmentAmount();
+        }
         if(Input.GetKeyDown(KeyCode.R))
         {
             Start();
@@ -53,7 +63,7 @@ public class HealthSystemTest : MonoBehaviour
         float previousHealth = currentHealth;
         currentHealth = Mathf.Clamp(currentHealth-damage,0,maxHealth);
         //Update UI
-        OnHealthChanged?.Invoke(currentHealth,previousHealth,false);
+        OnHealthChanged?.Invoke(currentHealth,previousHealth);
         //Comprobación de posible final de partida
         isAlive = currentHealth > 0;
         if(!isAlive)
@@ -65,7 +75,7 @@ public class HealthSystemTest : MonoBehaviour
     {
         if(!isAlive) return;
         //Update UI
-        OnHealthChanged?.Invoke(Mathf.Clamp(currentHealth + amount,0,maxHealth),currentHealth,true);
+        OnHealthChanged?.Invoke(Mathf.Clamp(currentHealth + amount,0,maxHealth),currentHealth);
         //Logic
         currentHealth = Mathf.Clamp(currentHealth + amount,0,maxHealth);
     }
@@ -76,7 +86,7 @@ public class HealthSystemTest : MonoBehaviour
         maxHealth += amount;
         currentHealth += amount;
         //Update UI
-        OnSetHealth?.Invoke(currentHealth,maxHealth,segmentValue);
+        OnSetHealth?.Invoke(currentHealth,maxHealth,currentSegmentValue);
     }
     public void RemoveMaxHealth(float amount)
     {
@@ -85,7 +95,12 @@ public class HealthSystemTest : MonoBehaviour
         maxHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth,0,maxHealth);
         //Update UI
-        OnSetHealth?.Invoke(currentHealth,maxHealth,segmentValue);
+        OnSetHealth?.Invoke(currentHealth,maxHealth,currentSegmentValue);
+    }
+    public void ChangeSegmentAmount()
+    {
+        currentSegmentValue = currentSegmentValue == segmentValue ? segmentValueExtra : segmentValue;
+        OnSetHealth?.Invoke(currentHealth,maxHealth,currentSegmentValue);
     }
     public bool CanHeal()
     {
