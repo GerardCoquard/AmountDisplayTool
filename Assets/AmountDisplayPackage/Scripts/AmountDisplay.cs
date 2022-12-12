@@ -37,12 +37,12 @@ public class AmountDisplay : MonoBehaviour
     //Segments(the visual part that represents the quantity of segmentValue of the Amount)
     
     private void OnEnable() {
-        HealthSystem.OnSetHealth += InitializeAll;
-        HealthSystem.OnHealthChanged += SetFillsFollow;
+        HealthSystemTest.OnSetHealth += InitializeAll;
+        HealthSystemTest.OnHealthChanged += SetFillsFollow;
     }
     private void OnDisable() {
-        HealthSystem.OnSetHealth -= InitializeAll;
-        HealthSystem.OnHealthChanged -= SetFillsFollow;
+        HealthSystemTest.OnSetHealth -= InitializeAll;
+        HealthSystemTest.OnHealthChanged -= SetFillsFollow;
     }
     private void Awake() {
         layoutGroup = GetComponent<HorizontalLayoutGroup>();

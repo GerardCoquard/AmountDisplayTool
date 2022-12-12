@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HealthSystem : MonoBehaviour, ITakeDamage
+public class HealthSystemTest : MonoBehaviour
 {
     [SerializeField] float maxHealth;
     [SerializeField] float segmentValue;
