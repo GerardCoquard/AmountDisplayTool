@@ -287,8 +287,6 @@ public class AmountDisplay : MonoBehaviour
                 Undo.RecordObject(this,"");
                 Undo.RecordObject(target,"");
                 Undo.RecordObject(amountDisplay,"");
-
-                SaveChanges();
                 
                 EditorUtility.SetDirty(this);
                 EditorUtility.SetDirty(target);
